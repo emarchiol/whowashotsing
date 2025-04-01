@@ -1,0 +1,19 @@
+{
+  "name": "whowashotsing",
+  "version": "1.0.0",
+  "description": "A script to show you recent players you played with",
+  "license": "ISC",
+  "author": "me",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "heroprotocol": "^2.0.2",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14"
+  }
+}
