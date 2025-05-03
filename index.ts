@@ -2,7 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const heroprotocol = require("heroprotocol");
 
-const REPLAY_DIR = "C:\\Users\\emili\\Documents\\Heroes of the Storm\\Accounts\\1336106\\2-Hero-1-8994686\\Replays\\Multiplayer";
+const REPLAY_DIR = "C:\\Users\\YOUR_USER\\Documents\\Heroes of the Storm\\Accounts\\YOUR_ACCOUNT\\YOUR_ACCOUNT_2\\Replays\\Multiplayer";
 const KNOWN_PLAYERS = [
     "NoobChicken",
     "Mostro",
