@@ -2,11 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const heroprotocol = require("heroprotocol");
 
-const REPLAY_DIR = "C:\\Users\\YOUR_USER\\Documents\\Heroes of the Storm\\Accounts\\YOUR_ACCOUNT\\YOUR_ACCOUNT_2\\Replays\\Multiplayer";
+const REPLAY_DIR = "C:\\Users\\emili\\Documents\\Heroes of the Storm\\Accounts\\1336106\\2-Hero-1-8994686\\Replays\\Multiplayer";
 const KNOWN_PLAYERS = [
     "NoobChicken",
     "Mostro",
-    "Billy",
+    "BILLY",
     "l00kus",
     "Ertai",
     "Namek",
@@ -31,7 +31,7 @@ function getLastReplayFiles(directory, count = 3) {
 }
 
 // Function to extract player names from a replay file
-function extractPlayers(replayFile){
+function extractPlayers(replayFile) {
     try {
         const details = heroprotocol.get(heroprotocol.DETAILS, replayFile);
         const enemyTeam = details.m_playerList.filter(player => player.m_teamId === 0).map(player => {
@@ -80,8 +80,8 @@ function extractMapName(replayFile) {
 
 // Main function
 function main() {
-    const replayFiles = getLastReplayFiles(REPLAY_DIR, 5);
-    
+    const replayFiles = getLastReplayFiles(REPLAY_DIR, 20);
+    let allPlayersName = [];
     replayFiles.reverse().forEach(replayFile => {
         const mapName = extractMapName(replayFile);
         const players = extractPlayers(replayFile);
@@ -91,19 +91,36 @@ function main() {
         console.log(`*******************`);
         // Enemy Team:
         console.log(`Enemy Team:`);
-        players[0].forEach(player => console.log(`  - ${player.name} (${player.hero})`));
+        
+        players[0].forEach(player => {
+            if(allPlayersName.includes(player.name)) {
+                console.log('\x1b[31m%s\x1b[0m', `  - ${player.name} (${player.hero})`);
+            } else {
+                console.log(`  - ${player.name} (${player.hero})`);
+                allPlayersName.push(player.name);
+                allPlayersName = allPlayersName.flat();
+            }
+        });
+        // console.log('pushing: ', players[0].map(en => en.name));
+        // console.log('allPlayersName', allPlayersName);
+        // allPlayersName.push(players[0].map(en => en.name));
 
         // Friendly Team:
         console.log(`\nFriendly Team:`);
         players[1].forEach(player => {
-            if (!KNOWN_PLAYERS.includes(player.name)) {
-            console.log(`  - ${player.name} (${player.hero})`);
+            if (!KNOWN_PLAYERS.includes(player.name) && allPlayersName.includes(player.name)) {
+                console.log('\x1b[31m%s\x1b[0m',`  - ${player.name} (${player.hero})`);
+            } else if(!KNOWN_PLAYERS.includes(player.name)) {
+                console.log(`  - ${player.name} (${player.hero})`);
+                allPlayersName.push(player.name);
+                allPlayersName = allPlayersName.flat();
             }
         });
         console.log(`-------------------`);
+        // Known players
         players[1].forEach(player => {
             if (KNOWN_PLAYERS.includes(player.name)) {
-            console.log(`  - ${player.name} (${player.hero})`);
+                console.log('\x1b[32m%s\x1b[0m', `  - ${player.name} (${player.hero})`);
             }
         });
         console.log(`\n===================`);
