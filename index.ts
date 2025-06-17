@@ -14,6 +14,7 @@ const KNOWN_PLAYERS = [
     "Pantufla",
     "Beelze360",
     "MeiMei",
+    "FixHots"
 ];
 
 // Function to get the latest replay files
