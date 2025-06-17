@@ -4,4 +4,5 @@ This small script reads through your last X replays and displays the players and
 ## How-to
 - Install node.
 1. Modify the **REPLAY_PATH** to your account path in `index.ts`.
-2. Run `whowashotsing.bat`.
+2. npm ci
+3. Run `whowashotsing.bat`.
