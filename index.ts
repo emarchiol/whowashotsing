@@ -95,9 +95,9 @@ function main() {
         
         players[0].forEach(player => {
             if(allPlayersName.includes(player.name)) {
-                console.log('\x1b[31m%s\x1b[0m', `  - ${player.name} (${player.hero})`);
+                console.log('\x1b[31m%s\x1b[0m', `  - ${player.hero} (${player.name})`);
             } else {
-                console.log(`  - ${player.name} (${player.hero})`);
+                console.log(`  - ${player.hero} (${player.name})`);
                 allPlayersName.push(player.name);
                 allPlayersName = allPlayersName.flat();
             }
@@ -110,9 +110,9 @@ function main() {
         console.log(`\nFriendly Team:`);
         players[1].forEach(player => {
             if (!KNOWN_PLAYERS.includes(player.name) && allPlayersName.includes(player.name)) {
-                console.log('\x1b[31m%s\x1b[0m',`  - ${player.name} (${player.hero})`);
+                console.log('\x1b[31m%s\x1b[0m',`  - ${player.hero} (${player.name})`);
             } else if(!KNOWN_PLAYERS.includes(player.name)) {
-                console.log(`  - ${player.name} (${player.hero})`);
+                console.log(`  - ${player.hero} (${player.name})`);
                 allPlayersName.push(player.name);
                 allPlayersName = allPlayersName.flat();
             }
@@ -121,7 +121,7 @@ function main() {
         // Known players
         players[1].forEach(player => {
             if (KNOWN_PLAYERS.includes(player.name)) {
-                console.log('\x1b[32m%s\x1b[0m', `  - ${player.name} (${player.hero})`);
+                console.log('\x1b[32m%s\x1b[0m', `  - ${player.hero} (${player.name})`);
             }
         });
         console.log(`\n===================`);
