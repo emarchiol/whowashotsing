@@ -3,7 +3,7 @@ This small script reads through your last X replays and displays the players and
 
 ## How-to
 - Install node.
-1. Create `.env` file with **HOTS_REPLAY_PATH** to your replay files hots path.
+1. Create `.env` file from `.env.default` with **HOTS_REPLAY_PATH** to your replay files hots path.
 2. Optionally add any known players to **HOTS_KNOWN_PLAYERS** list.
 3. npm ci
 4. Run `whowashotsing.bat`.

@@ -5,9 +5,10 @@ require('dotenv').config();
 
 const REPLAY_DIR = process.env.HOTS_REPLAY_PATH;
 const KNOWN_PLAYERS = process.env.HOTS_KNOWN_PLAYERS?.split(',').map(player => player.trim()) || [];
+const AMOUNT_OF_REPLAYS = process.env.AMOUNT_OF_REPLAYS || 3;
 
 // Function to get the latest replay files
-function getLastReplayFiles(directory, count = 3) {
+function getLastReplayFiles(directory, count = AMOUNT_OF_REPLAYS) {
     const files = fs.readdirSync(directory)
         .filter(file => file.endsWith(".StormReplay"))
         .map(file => ({
