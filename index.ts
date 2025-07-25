@@ -1,21 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 const heroprotocol = require("heroprotocol");
+require('dotenv').config();
 
-const REPLAY_DIR = "C:\\Users\\YOUR_USER\\Documents\\Heroes of the Storm\\Accounts\\YOUR_ACCOUNT\\YOUR_ACCOUNT_2\\Replays\\Multiplayer";
-const KNOWN_PLAYERS = [
-    "NoobChicken",
-    "Mostro",
-    "BILLY",
-    "l00kus",
-    "Ertai",
-    "Namek",
-    "Angel",
-    "Pantufla",
-    "Beelze360",
-    "MeiMei",
-    "FixHots"
-];
+const REPLAY_DIR = process.env.HOTS_REPLAY_PATH;
+const KNOWN_PLAYERS = process.env.HOTS_KNOWN_PLAYERS?.split(',').map(player => player.trim()) || [];
 
 // Function to get the latest replay files
 function getLastReplayFiles(directory, count = 3) {
@@ -90,8 +79,9 @@ function main() {
         console.log(`\n*******************`);
         console.log(`Map: ${mapName}`);
         console.log(`*******************`);
+        
         // Enemy Team:
-        console.log('\x1b[31m%s\x1b[0m', `Enemy Team:`);
+        console.log('\x1b[31m%s\x1b[0m',`Enemy Team`);
         
         players[0].forEach(player => {
             if(allPlayersName.includes(player.name)) {
@@ -104,7 +94,7 @@ function main() {
         });
 
         // Friendly Team:
-        console.log('\x1b[34m%s\x1b[0m',`Friendly Team`);
+        console.log('\x1b[34m%s\x1b[0m', `Friendly Team:`);
         players[1].forEach(player => {
             if (!KNOWN_PLAYERS.includes(player.name) && allPlayersName.includes(player.name)) {
                 console.log('\x1b[33m%s\x1b[0m',`  - ${player.hero} (${player.name})`);
