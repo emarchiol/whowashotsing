@@ -70,6 +70,10 @@ function extractMapName(replayFile) {
 
 // Main function
 function main() {
+    if(!REPLAY_DIR || !fs.existsSync(REPLAY_DIR)) {
+        console.error("Replay directory does not exist or is not set in the environment variables.");
+        throw new Error("Replay directory not found");
+    }
     const replayFiles = getLastReplayFiles(REPLAY_DIR, 20);
     let allPlayersName = [];
     replayFiles.reverse().forEach(replayFile => {
