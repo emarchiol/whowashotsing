@@ -91,26 +91,23 @@ function main() {
         console.log(`Map: ${mapName}`);
         console.log(`*******************`);
         // Enemy Team:
-        console.log(`Enemy Team:`);
+        console.log('\x1b[31m%s\x1b[0m', `Enemy Team:`);
         
         players[0].forEach(player => {
             if(allPlayersName.includes(player.name)) {
-                console.log('\x1b[31m%s\x1b[0m', `  - ${player.hero} (${player.name})`);
+                console.log('\x1b[33m%s\x1b[0m', `  - ${player.hero} (${player.name})`);
             } else {
                 console.log(`  - ${player.hero} (${player.name})`);
                 allPlayersName.push(player.name);
                 allPlayersName = allPlayersName.flat();
             }
         });
-        // console.log('pushing: ', players[0].map(en => en.name));
-        // console.log('allPlayersName', allPlayersName);
-        // allPlayersName.push(players[0].map(en => en.name));
 
         // Friendly Team:
-        console.log(`\nFriendly Team:`);
+        console.log('\x1b[34m%s\x1b[0m',`Friendly Team`);
         players[1].forEach(player => {
             if (!KNOWN_PLAYERS.includes(player.name) && allPlayersName.includes(player.name)) {
-                console.log('\x1b[31m%s\x1b[0m',`  - ${player.hero} (${player.name})`);
+                console.log('\x1b[33m%s\x1b[0m',`  - ${player.hero} (${player.name})`);
             } else if(!KNOWN_PLAYERS.includes(player.name)) {
                 console.log(`  - ${player.hero} (${player.name})`);
                 allPlayersName.push(player.name);
