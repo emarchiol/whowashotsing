@@ -94,7 +94,7 @@ function main() {
         });
 
         // Friendly Team:
-        console.log('\x1b[34m%s\x1b[0m', `Friendly Team:`);
+        console.log('\n\x1b[34m%s\x1b[0m', `Friendly Team:`);
         players[1].forEach(player => {
             if (!KNOWN_PLAYERS.includes(player.name) && allPlayersName.includes(player.name)) {
                 console.log('\x1b[33m%s\x1b[0m',`  - ${player.hero} (${player.name})`);
