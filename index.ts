@@ -293,23 +293,24 @@ async function getCurrentGameInfo(){
     return [currentGameFriendlyTeam, currentGameEnemyTeam];
 }
 
-function printCurrentGameInfo(currentPlayersInfo) {
+function printCurrentGameInfo(currentPlayersInfo, allPastPlayersInfo) {
     if(currentPlayersInfo?.length > 1) {
         console.log(`\n*******************`);
         console.log(`CURRENT GAME INFO`);
         console.log(`*******************`);
 
-        const leftTeamIsFriendly = currentPlayersInfo[0].some(player => PLAYER_NAME === player.playerName);
+        let isFriendlyTeam = currentPlayersInfo[0].some(player => PLAYER_NAME === player.playerName);
+        printTeamInfo(currentPlayersInfo[0], allPastPlayersInfo, isFriendlyTeam);
 
-        printTeamInfo(currentPlayersInfo[0], leftTeamIsFriendly);
-        printTeamInfo(currentPlayersInfo[1], leftTeamIsFriendly);
+        isFriendlyTeam = currentPlayersInfo[1].some(player => PLAYER_NAME === player.playerName);
+        printTeamInfo(currentPlayersInfo[1], allPastPlayersInfo, isFriendlyTeam);
 
         console.log(`\n===================`);
     }
 }
 
-function printTeamInfo(team, leftTeamIsFriendly) {
-    console.log(`\x1b[${leftTeamIsFriendly ? 34 : 31}m%s\x1b[0m`, leftTeamIsFriendly ? `Friendly Team:` : `Enemy Team:`);
+function printTeamInfo(team, allPastPlayersInfo, isFriendlyTeam) {
+    console.log(`\x1b[${isFriendlyTeam ? 34 : 31}m%s\x1b[0m`, isFriendlyTeam ? `Friendly Team:` : `Enemy Team:`);
     team.forEach(player => {
         if (KNOWN_PLAYERS.includes(player.playerName)) {
             console.log('\x1b[32m%s\x1b[0m', `  - ${player.heroName} (${player.playerName})`);
@@ -330,6 +331,9 @@ async function main() {
 
     // Get current game info
     const currentPlayersInfo = await getCurrentGameInfo();
+
+    // Print current game info
+    printCurrentGameInfo(currentPlayersInfo, allPastPlayersInfo);
 }
 
 // Run the script
