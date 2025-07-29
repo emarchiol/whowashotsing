@@ -11,6 +11,7 @@ const REPLAY_DIR = process.env.HOTS_REPLAY_PATH;
 const KNOWN_PLAYERS = process.env.HOTS_KNOWN_PLAYERS?.split(',').map(player => player.trim()) || [];
 const AMOUNT_OF_REPLAYS = process.env.AMOUNT_OF_REPLAYS || 3;
 const HOTS_SCREENSHOTS_PATH = process.env.HOTS_SCREENSHOTS_PATH;
+const PLAYER_NAME = process.env.MY_PLAYER_NAME;
 
 // Read the file synchronously
 const heroesFile = fs.readFileSync('heroes.json', 'utf8');
@@ -108,14 +109,7 @@ async function cropTeamNames(fileName, resolutionWidth, resolutionHeight, isFrie
     const topStartingPoint3 = top + (((resolutionHeight * 12.25)/100)*2);
     const topStartingPoint4 = top + (((resolutionHeight * 12.25)/100)*3);
     const topStartingPoint5 = top + (((resolutionHeight * 12.25)/100)*4);
-    // const playersTopStartingPoint = [
-    //     // manually calculated
-    //     245,
-    //     378, // rounded from 375.5
-    //     510,
-    //     644, // rounded from 643.5
-    //     775,
-    // ];
+
     const playersTopStartingPoint = [
         Math.ceil(topStartingPoint),
         Math.ceil(topStartingPoint2),
@@ -124,16 +118,16 @@ async function cropTeamNames(fileName, resolutionWidth, resolutionHeight, isFrie
         Math.ceil(topStartingPoint5),
     ];
 
-    console.log('TEAM FRIEND: ', isFriendlyTeam);
-    console.log('left: ', left);
-    console.log('width: ', width);
-    console.log('height: ', height);
-    console.log('playersTopStartingPoint: ', playersTopStartingPoint);
+    // console.log('TEAM FRIEND: ', isFriendlyTeam);
+    // console.log('left: ', left);
+    // console.log('width: ', width);
+    // console.log('height: ', height);
+    // console.log('playersTopStartingPoint: ', playersTopStartingPoint);
 
 
     for (let playerNumber = 0; playerNumber < playersTopStartingPoint.length; playerNumber++) {
         const teamSide = isFriendlyTeam ? 'friendly' : 'enemy';
-        const processedPath = `test_screenshots/processed_${teamSide}_${playerNumber}.png`;
+        const processedPath = `processed_screenshot/processed_${teamSide}_${playerNumber}.png`;
         const topStartingPoint = playersTopStartingPoint[playerNumber];
 
         const playerCoordinates = {
@@ -170,19 +164,19 @@ async function cropTeamNames(fileName, resolutionWidth, resolutionHeight, isFrie
             'eng',
             {
                 tessedit_pageseg_mode: Tesseract.PSM.SINGLE_LINE, // Optional: layout mode
-                logger: m => console.log(m), // Optional: progress log
+                // logger: m => console.log(m), // Optional: progress log
             }
         );
 
         // Extract the hero name from the json
-        const extractedDirtyHeroName = extractedData.data.text.split('\n')[0].trim();
+        const extractedDirtyHeroName = extractedData.data.text.split('\n')[0]?.trim();
         const heroName = extractedDirtyHeroName.replace(/[^a-zA-Z]/g, '').toLowerCase();
-        const allHeroesLower = ALL_HEROES.map(hero => hero.name);
-        const hero = stringSimilarity.findBestMatch(heroName, allHeroesLower).bestMatch;
+        const allHeroesDb = ALL_HEROES.map(hero => hero.name);
+        const hero = stringSimilarity.findBestMatch(heroName, allHeroesDb).bestMatch;
         
         const playerInfo = {
             heroName: hero?.target,
-            playerName: extractedData.data.text.split('\n')[1].trim(),
+            playerName: extractedData.data.text.split('\n')[1]?.trim(),
         }
 
         playerNames.push(playerInfo);
@@ -202,26 +196,32 @@ async function cropTeamNames(fileName, resolutionWidth, resolutionHeight, isFrie
 
 async function extractGameResolution() {
     // Mocked
+    // Look into C:\Users\emili\Documents\Heroes of the Storm\Variables.txt -> width and height (width=2560, height=1440)
     return {
-        width: 1920,
-        height: 1080
+        width: 2560,
+        height: 1440
     }
 }
 
-async function extractLastScreenshotFilePath(folderPath) {
-    // Mocked
-    fs.watch(folderPath, (eventType, filename) => {
-        if (filename) {
-          console.log(`Change detected: ${filename} (${eventType})`);
-          return folderPath+'/'+filename;
-          return 'test_screenshots/screenshot.jpeg';
-        }
-      });
+function extractLastScreenshotFilePath(folderPath) {
+    return new Promise((resolve, reject) => {
+       console.log(`Watching for game loading screenshots in directory: ${folderPath}`);
+       const watcher = fs.watch(folderPath, (eventType, filename) => {
+            if (filename) {
+                console.log(`Change detected: ${filename} (${eventType}), loading info from screenshot...`);
+                watcher.close();
+                resolve(`${folderPath}\\\\${filename}`);
+                // resolve('test_screenshots\screenshot.jpeg');
+            }
+        });
+        watcher.on('error', (error) => {
+            console.error('Error watching directory:', error);
+            reject(error);
+        });
+    });
 }
 
-// Main function
-async function main() {
-
+function getPlayersFromReplays() {
     if(!REPLAY_DIR || !fs.existsSync(REPLAY_DIR)) {
         console.error("Replay directory does not exist or is not set in the environment variables.");
         throw new Error("Replay directory not found");
@@ -270,25 +270,66 @@ async function main() {
         console.log(`\n===================`);
     });
 
-    // CURRENT GAME INFO
-        
-     // Extract game resolution
-     const resolution = await extractGameResolution();
+    return allPlayersName;
+}
 
-     // Check if screenshots directory is updated.
-     const screenshotFilePath = await extractLastScreenshotFilePath(HOTS_SCREENSHOTS_PATH);
- 
-     const currentGameFriendlyTeam = await cropTeamNames(screenshotFilePath, resolution.width, resolution.height, true);
-     const currentGameEnemyTeam = await cropTeamNames(screenshotFilePath, resolution.width, resolution.height, false);
- 
-     // Don't show incomplete extractions
-     if(!currentGameFriendlyTeam || !currentGameEnemyTeam) {
-         return;
-     }
- 
-     console.log(currentGameFriendlyTeam);
-     console.log(currentGameEnemyTeam);
-     return;
+async function getCurrentGameInfo(){
+    // CURRENT GAME INFO
+
+    // Extract game resolution
+    const resolution = await extractGameResolution();
+
+    // Check if screenshots directory is updated.
+    const screenshotFilePath = await extractLastScreenshotFilePath(HOTS_SCREENSHOTS_PATH);
+    await new Promise(resolve => setTimeout(resolve, 500)); // Wait for the screenshot to be ready
+    const currentGameFriendlyTeam = await cropTeamNames(screenshotFilePath, resolution.width, resolution.height, true);
+    const currentGameEnemyTeam = await cropTeamNames(screenshotFilePath, resolution.width, resolution.height, false);
+
+    // Don't show incomplete extractions
+    if(!currentGameFriendlyTeam || !currentGameEnemyTeam) {
+        return;
+    }
+
+    return [currentGameFriendlyTeam, currentGameEnemyTeam];
+}
+
+function printCurrentGameInfo(currentPlayersInfo) {
+    if(currentPlayersInfo?.length > 1) {
+        console.log(`\n*******************`);
+        console.log(`CURRENT GAME INFO`);
+        console.log(`*******************`);
+
+        const leftTeamIsFriendly = currentPlayersInfo[0].some(player => PLAYER_NAME === player.playerName);
+
+        printTeamInfo(currentPlayersInfo[0], leftTeamIsFriendly);
+        printTeamInfo(currentPlayersInfo[1], leftTeamIsFriendly);
+
+        console.log(`\n===================`);
+    }
+}
+
+function printTeamInfo(team, leftTeamIsFriendly) {
+    console.log(`\x1b[${leftTeamIsFriendly ? 34 : 31}m%s\x1b[0m`, leftTeamIsFriendly ? `Friendly Team:` : `Enemy Team:`);
+    team.forEach(player => {
+        if (KNOWN_PLAYERS.includes(player.playerName)) {
+            console.log('\x1b[32m%s\x1b[0m', `  - ${player.heroName} (${player.playerName})`);
+        } else {
+            if (allPastPlayersInfo.includes(player.playerName)) {
+                console.log('\x1b[33m%s\x1b[0m', `  - ${player.heroName} (${player.playerName})`);
+            } else {
+                console.log(`  - ${player.heroName} (${player.playerName})`);
+            }
+        }
+    });
+}
+
+// Main function
+async function main() {
+    // Get past replay players info.
+    const allPastPlayersInfo = getPlayersFromReplays();
+
+    // Get current game info
+    const currentPlayersInfo = await getCurrentGameInfo();
 }
 
 // Run the script

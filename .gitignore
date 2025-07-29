@@ -1,3 +1,4 @@
 node_modules/
 replays/
 .env
+processed_screenshot/*.*
